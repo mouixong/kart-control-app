@@ -7,6 +7,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Activity, Download, Trash2, Pause, Play } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { useTheme } from '../hooks/useTheme';
 
 export const DataLogPage: React.FC = () => {
   const {
@@ -17,6 +18,7 @@ export const DataLogPage: React.FC = () => {
     clearDataLog,
   } = useStore();
 
+  const { theme, colors } = useTheme();
   const [isLogging, setIsLogging] = useState(false);
   const logIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -173,10 +175,10 @@ export const DataLogPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 pb-20">
+    <div className={`min-h-screen ${colors.bg} p-4 pb-20`}>
       {/* 页面标题 */}
       <div className="text-center mb-4">
-        <h2 className="text-xl font-bold text-cyan-400">数据记录</h2>
+        <h2 className={`text-xl font-bold ${colors.accent}`}>数据记录</h2>
       </div>
 
       <div className="max-w-md mx-auto space-y-4">
@@ -190,7 +192,9 @@ export const DataLogPage: React.FC = () => {
               transition-all duration-300
               ${isLogging
                 ? 'bg-red-500/20 text-red-400 border border-red-500/50'
-                : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+                : theme === 'dark'
+                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+                  : 'bg-blue-500/20 text-blue-500 border border-blue-500/50'
               }
               ${!isConnected ? 'opacity-50 cursor-not-allowed' : ''}
             `}
@@ -227,23 +231,23 @@ export const DataLogPage: React.FC = () => {
         </div>
 
         {/* 记录状态 */}
-        <div className="bg-gray-800/60 rounded-2xl p-3 border border-gray-700/50">
+        <div className={`${colors.card} rounded-2xl p-3 border ${colors.cardBorder}`}>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">记录状态</span>
-            <span className={isLogging ? 'text-green-400' : 'text-gray-500'}>
+            <span className={colors.textMuted}>记录状态</span>
+            <span className={isLogging ? colors.success : colors.textMuted}>
               {isLogging ? '记录中' : '已停止'}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm mt-1">
-            <span className="text-gray-400">记录条数</span>
-            <span className="text-cyan-400">{dataLog.length} 条</span>
+            <span className={colors.textMuted}>记录条数</span>
+            <span className={colors.accent}>{dataLog.length} 条</span>
           </div>
         </div>
 
         {/* 数据曲线 */}
         {dataLog.length > 1 && (
-          <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-            <h3 className="text-cyan-400 text-sm font-medium mb-2">数据曲线</h3>
+          <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+            <h3 className={`${colors.accent} text-sm font-medium mb-2`}>数据曲线</h3>
             <canvas
               ref={canvasRef}
               className="w-full h-40 rounded-lg"
@@ -253,12 +257,12 @@ export const DataLogPage: React.FC = () => {
 
         {/* 实时数据表格 */}
         {dataLog.length > 0 && (
-          <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-            <h3 className="text-cyan-400 text-sm font-medium mb-2">最近数据</h3>
+          <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+            <h3 className={`${colors.accent} text-sm font-medium mb-2`}>最近数据</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="text-gray-500">
+                  <tr className={colors.textMuted}>
                     <th className="text-left py-1">时间</th>
                     <th className="text-right py-1">左轮</th>
                     <th className="text-right py-1">右轮</th>
@@ -268,20 +272,20 @@ export const DataLogPage: React.FC = () => {
                 </thead>
                 <tbody>
                   {dataLog.slice(-10).reverse().map((entry, index) => (
-                    <tr key={index} className="border-t border-gray-700/50">
-                      <td className="py-1 text-gray-400">
+                    <tr key={index} className={`border-t ${colors.cardBorder}`}>
+                      <td className={`py-1 ${colors.textSecondary}`}>
                         {new Date(entry.timestamp).toLocaleTimeString('zh-CN')}
                       </td>
-                      <td className="text-right py-1 text-cyan-400">
+                      <td className={`text-right py-1 ${theme === 'dark' ? 'text-cyan-400' : 'text-blue-500'}`}>
                         {entry.status.speedL}
                       </td>
-                      <td className="text-right py-1 text-purple-400">
+                      <td className={`text-right py-1 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-500'}`}>
                         {entry.status.speedR}
                       </td>
-                      <td className="text-right py-1 text-green-400">
+                      <td className={`text-right py-1 ${colors.success}`}>
                         {(entry.status.batVoltage / 100).toFixed(1)}V
                       </td>
-                      <td className="text-right py-1 text-red-400">
+                      <td className={`text-right py-1 ${colors.danger}`}>
                         {(entry.status.boardTemp / 10).toFixed(1)}°C
                       </td>
                     </tr>
@@ -295,9 +299,9 @@ export const DataLogPage: React.FC = () => {
         {/* 空状态 */}
         {dataLog.length === 0 && (
           <div className="text-center py-12">
-            <Activity className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-500 text-sm">暂无数据记录</p>
-            <p className="text-gray-600 text-xs mt-1">点击"开始记录"按钮开始记录数据</p>
+            <Activity className={`w-12 h-12 mx-auto mb-3 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-300'}`} />
+            <p className={`text-sm ${colors.textMuted}`}>暂无数据记录</p>
+            <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`}>点击"开始记录"按钮开始记录数据</p>
           </div>
         )}
       </div>

@@ -7,10 +7,12 @@ import React, { useState, useRef } from 'react';
 import { Upload, FileUp, AlertCircle, CheckCircle, XCircle, RotateCw } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { useBLE } from '../hooks/useBLE';
+import { useTheme } from '../hooks/useTheme';
 
 export const OTAPage: React.FC = () => {
   const { isConnected, otaProgress, otaStatus, setOtaProgress, setOtaStatus } = useStore();
   const { sendRawData } = useBLE();
+  const { theme, colors } = useTheme();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileInfo, setFileInfo] = useState<{ name: string; size: number } | null>(null);
@@ -130,21 +132,21 @@ export const OTAPage: React.FC = () => {
 
   // 状态显示
   const statusConfig = {
-    idle: { icon: Upload, text: '准备就绪', color: 'text-gray-400', bg: 'bg-gray-800/60' },
-    downloading: { icon: RotateCw, text: '下载中...', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-    uploading: { icon: RotateCw, text: '上传中...', color: 'text-cyan-400', bg: 'bg-cyan-500/10' },
-    success: { icon: CheckCircle, text: '升级成功', color: 'text-green-400', bg: 'bg-green-500/10' },
-    error: { icon: XCircle, text: '升级失败', color: 'text-red-400', bg: 'bg-red-500/10' },
+    idle: { icon: Upload, text: '准备就绪', color: colors.textMuted, bg: theme === 'dark' ? 'bg-gray-800/60' : 'bg-gray-100' },
+    downloading: { icon: RotateCw, text: '下载中...', color: theme === 'dark' ? 'text-blue-400' : 'text-blue-500', bg: theme === 'dark' ? 'bg-blue-500/10' : 'bg-blue-500/10' },
+    uploading: { icon: RotateCw, text: '上传中...', color: colors.accent, bg: theme === 'dark' ? 'bg-cyan-500/10' : 'bg-blue-500/10' },
+    success: { icon: CheckCircle, text: '升级成功', color: colors.success, bg: theme === 'dark' ? 'bg-green-500/10' : 'bg-green-500/10' },
+    error: { icon: XCircle, text: '升级失败', color: colors.danger, bg: theme === 'dark' ? 'bg-red-500/10' : 'bg-red-500/10' },
   };
 
   const currentStatus = statusConfig[otaStatus];
   const StatusIcon = currentStatus.icon;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4">
+    <div className={`min-h-screen ${colors.bg} p-4`}>
       {/* 页面标题 */}
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-cyan-400">固件升级</h2>
+        <h2 className={`text-xl font-bold ${colors.accent}`}>固件升级</h2>
       </div>
 
       <div className="max-w-md mx-auto space-y-6">
@@ -165,8 +167,8 @@ export const OTAPage: React.FC = () => {
         </div>
 
         {/* 文件选择 */}
-        <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-          <h3 className="text-cyan-400 text-sm font-medium mb-3">选择固件文件</h3>
+        <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+          <h3 className={`${colors.accent} text-sm font-medium mb-3`}>选择固件文件</h3>
 
           <input
             type="file"
@@ -183,23 +185,27 @@ export const OTAPage: React.FC = () => {
               w-full flex items-center justify-center gap-3 p-6 rounded-xl border-2 border-dashed
               transition-all duration-300
               ${fileInfo
-                ? 'border-cyan-500/50 bg-cyan-500/10'
-                : 'border-gray-600 hover:border-gray-500'
+                ? theme === 'dark'
+                  ? 'border-cyan-500/50 bg-cyan-500/10'
+                  : 'border-blue-500/50 bg-blue-500/10'
+                : theme === 'dark'
+                  ? 'border-gray-600 hover:border-gray-500'
+                  : 'border-gray-300 hover:border-gray-400'
               }
               ${!isConnected ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
-            <FileUp className={`w-8 h-8 ${fileInfo ? 'text-cyan-400' : 'text-gray-500'}`} />
+            <FileUp className={`w-8 h-8 ${fileInfo ? colors.accent : colors.textMuted}`} />
             <div className="text-left">
               {fileInfo ? (
                 <>
-                  <p className="text-sm text-cyan-400">{fileInfo.name}</p>
-                  <p className="text-xs text-gray-400">{formatFileSize(fileInfo.size)}</p>
+                  <p className={`text-sm ${colors.accent}`}>{fileInfo.name}</p>
+                  <p className={`text-xs ${colors.textMuted}`}>{formatFileSize(fileInfo.size)}</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-gray-300">点击选择固件文件</p>
-                  <p className="text-xs text-gray-500">支持 .bin 和 .hex 格式</p>
+                  <p className={`text-sm ${colors.textSecondary}`}>点击选择固件文件</p>
+                  <p className={`text-xs ${colors.textMuted}`}>支持 .bin 和 .hex 格式</p>
                 </>
               )}
             </div>
@@ -208,7 +214,7 @@ export const OTAPage: React.FC = () => {
 
         {/* 升级状态 */}
         {otaStatus !== 'idle' && (
-          <div className={`${currentStatus.bg} rounded-2xl p-4 border border-gray-700/50`}>
+          <div className={`${currentStatus.bg} rounded-2xl p-4 border ${colors.cardBorder}`}>
             <div className="flex items-center gap-3 mb-3">
               <StatusIcon className={`w-5 h-5 ${currentStatus.color} ${otaStatus === 'uploading' ? 'animate-spin' : ''}`} />
               <span className={`text-sm font-medium ${currentStatus.color}`}>
@@ -219,13 +225,13 @@ export const OTAPage: React.FC = () => {
             {/* 进度条 */}
             {otaStatus === 'uploading' && (
               <div>
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <div className={`flex justify-between text-xs ${colors.textMuted} mb-1`}>
                   <span>上传进度</span>
                   <span>{otaProgress}%</span>
                 </div>
-                <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div className={`h-2 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
                   <div
-                    className="h-full bg-cyan-400 rounded-full transition-all duration-300"
+                    className={`h-full ${colors.accentBg} rounded-full transition-all duration-300`}
                     style={{ width: `${otaProgress}%` }}
                   />
                 </div>
@@ -242,8 +248,12 @@ export const OTAPage: React.FC = () => {
             w-full py-3 rounded-xl text-sm font-medium
             transition-all duration-300
             ${isConnected && selectedFile && otaStatus !== 'uploading'
-              ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30 hover:bg-cyan-400'
-              : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+              ? theme === 'dark'
+                ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30 hover:bg-cyan-400'
+                : 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-400'
+              : theme === 'dark'
+                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }
           `}
         >
@@ -259,7 +269,7 @@ export const OTAPage: React.FC = () => {
 
         {/* 连接状态提示 */}
         {!isConnected && (
-          <p className="text-center text-xs text-gray-500">
+          <p className={`text-center text-xs ${colors.textMuted}`}>
             请先连接卡丁车设备
           </p>
         )}

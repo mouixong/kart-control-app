@@ -8,9 +8,11 @@ import React from 'react';
 import { Route, Clock, Gauge, TrendingUp, Zap, Calendar, Activity, Thermometer, Battery, RotateCcw } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { Gauge as GaugeComponent } from '../components/Gauge';
+import { useTheme } from '../hooks/useTheme';
 
 export const StatsPage: React.FC = () => {
   const { statistics, tripHistory, vehicleStatus, isConnected } = useStore();
+  const { theme, colors } = useTheme();
 
   // 格式化距离
   const formatDistance = (meters: number) => {
@@ -91,19 +93,19 @@ export const StatsPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 pb-20">
+    <div className={`min-h-screen ${colors.bg} p-4 pb-20`}>
       {/* 页面标题 */}
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-cyan-400">统计与状态</h2>
+        <h2 className={`text-xl font-bold ${colors.accent}`}>统计与状态</h2>
         {!isConnected && (
-          <p className="text-xs text-gray-500 mt-1">未连接车辆 - 实时状态不可用</p>
+          <p className={`text-xs ${colors.textMuted} mt-1`}>未连接车辆 - 实时状态不可用</p>
         )}
       </div>
 
       <div className="max-w-md mx-auto space-y-6">
         {/* 实时状态仪表盘 */}
-        <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-          <h3 className="text-cyan-400 text-sm font-medium mb-4 flex items-center gap-2">
+        <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+          <h3 className={`${colors.accent} text-sm font-medium mb-4 flex items-center gap-2`}>
             <Activity className="w-4 h-4" />
             实时状态
           </h3>
@@ -135,37 +137,37 @@ export const StatsPage: React.FC = () => {
             </div>
 
             {/* 左轮速度 */}
-            <div className="bg-gray-700/40 rounded-xl p-3 flex items-center gap-3">
+            <div className={`${colors.inputBg} rounded-xl p-3 flex items-center gap-3`}>
               <RotateCcw className="w-5 h-5 text-blue-400" />
               <div>
-                <p className="text-xs text-gray-400">左轮转速</p>
+                <p className={`text-xs ${colors.textMuted}`}>左轮转速</p>
                 <p className="text-sm font-medium text-blue-400">{vehicleStatus.speedL} RPM</p>
               </div>
             </div>
 
             {/* 右轮速度 */}
-            <div className="bg-gray-700/40 rounded-xl p-3 flex items-center gap-3">
+            <div className={`${colors.inputBg} rounded-xl p-3 flex items-center gap-3`}>
               <RotateCcw className="w-5 h-5 text-purple-400" />
               <div>
-                <p className="text-xs text-gray-400">右轮转速</p>
+                <p className={`text-xs ${colors.textMuted}`}>右轮转速</p>
                 <p className="text-sm font-medium text-purple-400">{vehicleStatus.speedR} RPM</p>
               </div>
             </div>
 
             {/* 温度 */}
-            <div className="bg-gray-700/40 rounded-xl p-3 flex items-center gap-3">
+            <div className={`${colors.inputBg} rounded-xl p-3 flex items-center gap-3`}>
               <Thermometer className="w-5 h-5 text-red-400" />
               <div>
-                <p className="text-xs text-gray-400">板子温度</p>
+                <p className={`text-xs ${colors.textMuted}`}>板子温度</p>
                 <p className="text-sm font-medium text-red-400">{temp.toFixed(1)} °C</p>
               </div>
             </div>
 
             {/* LED状态 */}
-            <div className="bg-gray-700/40 rounded-xl p-3 flex items-center gap-3">
+            <div className={`${colors.inputBg} rounded-xl p-3 flex items-center gap-3`}>
               <Battery className="w-5 h-5 text-yellow-400" />
               <div>
-                <p className="text-xs text-gray-400">LED命令</p>
+                <p className={`text-xs ${colors.textMuted}`}>LED命令</p>
                 <p className="text-sm font-medium text-yellow-400">0x{vehicleStatus.cmdLed.toString(16).toUpperCase().padStart(4, '0')}</p>
               </div>
             </div>
@@ -173,32 +175,32 @@ export const StatsPage: React.FC = () => {
         </div>
 
         {/* 统计卡片 */}
-        <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-          <h3 className="text-cyan-400 text-sm font-medium mb-4">行驶统计</h3>
+        <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+          <h3 className={`${colors.accent} text-sm font-medium mb-4`}>行驶统计</h3>
           <div className="grid grid-cols-2 gap-3">
             {statCards.map((card) => {
               const Icon = card.icon;
               const colorMap: Record<string, string> = {
-                cyan: 'text-cyan-400 bg-cyan-400/10',
-                blue: 'text-blue-400 bg-blue-400/10',
-                orange: 'text-orange-400 bg-orange-400/10',
-                green: 'text-green-400 bg-green-400/10',
-                purple: 'text-purple-400 bg-purple-400/10',
-                pink: 'text-pink-400 bg-pink-400/10',
+                cyan: theme === 'dark' ? 'text-cyan-400 bg-cyan-400/10' : 'text-blue-500 bg-blue-500/10',
+                blue: theme === 'dark' ? 'text-blue-400 bg-blue-400/10' : 'text-blue-500 bg-blue-500/10',
+                orange: theme === 'dark' ? 'text-orange-400 bg-orange-400/10' : 'text-orange-500 bg-orange-500/10',
+                green: theme === 'dark' ? 'text-green-400 bg-green-400/10' : 'text-green-500 bg-green-500/10',
+                purple: theme === 'dark' ? 'text-purple-400 bg-purple-400/10' : 'text-purple-500 bg-purple-500/10',
+                pink: theme === 'dark' ? 'text-pink-400 bg-pink-400/10' : 'text-pink-500 bg-pink-500/10',
               };
               const colorClass = colorMap[card.color] || colorMap.cyan;
 
               return (
                 <div
                   key={card.label}
-                  className="bg-gray-700/40 rounded-xl p-3 flex items-start gap-3"
+                  className={`${colors.inputBg} rounded-xl p-3 flex items-start gap-3`}
                 >
                   <div className={`p-2 rounded-lg ${colorClass}`}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">{card.label}</p>
-                    <p className="text-sm font-medium text-white">{card.value}</p>
+                    <p className={`text-xs ${colors.textMuted}`}>{card.label}</p>
+                    <p className={`text-sm font-medium ${colors.text}`}>{card.value}</p>
                   </div>
                 </div>
               );
@@ -207,20 +209,20 @@ export const StatsPage: React.FC = () => {
         </div>
 
         {/* 本周/本月概览 */}
-        <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-          <h3 className="text-cyan-400 text-sm font-medium mb-3">近期概览</h3>
+        <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+          <h3 className={`${colors.accent} text-sm font-medium mb-3`}>近期概览</h3>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-400">本周行程</span>
-              <span className="text-sm text-white">{weekTrips.length} 次</span>
+              <span className={`text-sm ${colors.textMuted}`}>本周行程</span>
+              <span className={`text-sm ${colors.text}`}>{weekTrips.length} 次</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-400">本周时长</span>
-              <span className="text-sm text-white">{formatDuration(weekDuration)}</span>
+              <span className={`text-sm ${colors.textMuted}`}>本周时长</span>
+              <span className={`text-sm ${colors.text}`}>{formatDuration(weekDuration)}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-400">本月里程</span>
-              <span className="text-sm text-white">{formatDistance(monthDistance)}</span>
+              <span className={`text-sm ${colors.textMuted}`}>本月里程</span>
+              <span className={`text-sm ${colors.text}`}>{formatDistance(monthDistance)}</span>
             </div>
           </div>
         </div>

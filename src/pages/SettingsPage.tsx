@@ -8,10 +8,12 @@ import React, { useState } from 'react';
 import { Volume2, VolumeX, Wrench, RotateCcw, Save, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { useBLE } from '../hooks/useBLE';
+import { useTheme } from '../hooks/useTheme';
 
 export const SettingsPage: React.FC = () => {
   const { sendParamCommand, sendSaveCommand } = useBLE();
   const { isConnected } = useStore();
+  const { theme, colors } = useTheme();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [calibrating, setCalibrating] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -88,10 +90,10 @@ export const SettingsPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 pb-20">
+    <div className={`min-h-screen ${colors.bg} p-4 pb-20`}>
       {/* 页面标题 */}
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-cyan-400">设置</h2>
+        <h2 className={`text-xl font-bold ${colors.accent}`}>设置</h2>
         {!isConnected && (
           <p className="text-xs text-orange-400 mt-1 flex items-center justify-center gap-1">
             <AlertTriangle className="w-3 h-3" />
@@ -102,21 +104,21 @@ export const SettingsPage: React.FC = () => {
 
       <div className="max-w-md mx-auto space-y-6">
         {/* 提示音开关 */}
-        <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
+        <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {soundEnabled ? (
-                <Volume2 className="w-5 h-5 text-cyan-400" />
+                <Volume2 className={`w-5 h-5 ${colors.accent}`} />
               ) : (
-                <VolumeX className="w-5 h-5 text-gray-400" />
+                <VolumeX className={`w-5 h-5 ${colors.textMuted}`} />
               )}
-              <span className="text-gray-300 text-sm">提示音</span>
+              <span className={`${colors.textSecondary} text-sm`}>提示音</span>
             </div>
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className={`
                 w-12 h-6 rounded-full transition-all duration-300 relative
-                ${soundEnabled ? 'bg-cyan-500' : 'bg-gray-600'}
+                ${soundEnabled ? colors.accentBg : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}
               `}
             >
               <div
@@ -131,8 +133,8 @@ export const SettingsPage: React.FC = () => {
         </div>
 
         {/* 自动校准 */}
-        <div className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-          <h3 className="text-cyan-400 text-sm font-medium mb-3 flex items-center gap-2">
+        <div className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+          <h3 className={`${colors.accent} text-sm font-medium mb-3 flex items-center gap-2`}>
             <Wrench className="w-4 h-4" />
             自动校准
           </h3>
@@ -140,25 +142,25 @@ export const SettingsPage: React.FC = () => {
             <button
               onClick={() => handleCalibrate('HALL')}
               disabled={calibrating || !isConnected}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-700/50 hover:bg-gray-600/50 transition-colors disabled:opacity-50"
+              className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors disabled:opacity-50 ${colors.inputBg} ${theme === 'dark' ? 'hover:bg-gray-600/50' : 'hover:bg-gray-200'}`}
             >
-              <span className="text-sm text-gray-300">霍尔传感器校准</span>
+              <span className={`text-sm ${colors.textSecondary}`}>霍尔传感器校准</span>
               {calibrating ? (
-                <RotateCcw className="w-4 h-4 text-cyan-400 animate-spin" />
+                <RotateCcw className={`w-4 h-4 ${colors.accent} animate-spin`} />
               ) : (
-                <span className="text-xs text-cyan-400">开始</span>
+                <span className={`text-xs ${colors.accent}`}>开始</span>
               )}
             </button>
             <button
               onClick={() => handleCalibrate('ADC')}
               disabled={calibrating || !isConnected}
-              className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-700/50 hover:bg-gray-600/50 transition-colors disabled:opacity-50"
+              className={`w-full flex items-center justify-between p-3 rounded-xl transition-colors disabled:opacity-50 ${colors.inputBg} ${theme === 'dark' ? 'hover:bg-gray-600/50' : 'hover:bg-gray-200'}`}
             >
-              <span className="text-sm text-gray-300">ADC校准</span>
+              <span className={`text-sm ${colors.textSecondary}`}>ADC校准</span>
               {calibrating ? (
-                <RotateCcw className="w-4 h-4 text-cyan-400 animate-spin" />
+                <RotateCcw className={`w-4 h-4 ${colors.accent} animate-spin`} />
               ) : (
-                <span className="text-xs text-cyan-400">开始</span>
+                <span className={`text-xs ${colors.accent}`}>开始</span>
               )}
             </button>
           </div>
@@ -166,17 +168,17 @@ export const SettingsPage: React.FC = () => {
 
         {/* 固件参数调节 */}
         {paramGroups.map((group) => (
-          <div key={group.title} className="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/50">
-            <h3 className="text-cyan-400 text-sm font-medium mb-4">{group.title}</h3>
+          <div key={group.title} className={`${colors.card} rounded-2xl p-4 border ${colors.cardBorder}`}>
+            <h3 className={`${colors.accent} text-sm font-medium mb-4`}>{group.title}</h3>
             <div className="space-y-4">
               {group.items.map((item) => (
                 <div key={item.key}>
                   <div className="flex justify-between mb-1">
                     <div>
-                      <span className="text-sm text-gray-300">{item.label}</span>
-                      <span className="text-xs text-gray-500 ml-2">({item.name})</span>
+                      <span className={`text-sm ${colors.textSecondary}`}>{item.label}</span>
+                      <span className={`text-xs ${colors.textMuted} ml-2`}>({item.name})</span>
                     </div>
-                    <span className="text-sm text-cyan-400">{params[item.key]}</span>
+                    <span className={`text-sm ${colors.accent}`}>{params[item.key]}</span>
                   </div>
                   <input
                     type="range"
@@ -185,14 +187,14 @@ export const SettingsPage: React.FC = () => {
                     step={item.step}
                     value={params[item.key]}
                     onChange={(e) => handleParamChange(item.key, parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+                    className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${theme === 'dark' ? 'bg-gray-700 accent-cyan-400' : 'bg-gray-200 accent-blue-500'}`}
                   />
                   <div className="flex justify-between mt-1">
-                    <span className="text-[10px] text-gray-500">{item.help}</span>
+                    <span className={`text-[10px] ${colors.textMuted}`}>{item.help}</span>
                     <button
                       onClick={() => handleSendParam(item.name, params[item.key])}
                       disabled={!isConnected}
-                      className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition-colors disabled:opacity-50"
+                      className={`text-[10px] px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${theme === 'dark' ? 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30' : 'bg-blue-500/20 text-blue-500 hover:bg-blue-500/30'}`}
                     >
                       发送
                     </button>
@@ -218,8 +220,8 @@ export const SettingsPage: React.FC = () => {
         </button>
 
         {/* 协议说明 */}
-        <div className="bg-gray-800/40 rounded-xl p-3 border border-gray-700/30">
-          <p className="text-xs text-gray-500 leading-relaxed">
+        <div className={`${colors.card} rounded-xl p-3 border ${colors.cardBorder}`}>
+          <p className={`text-xs ${colors.textMuted} leading-relaxed`}>
             参数设置通过DEBUG串口文本协议发送。固件需启用 DEBUG_SERIAL_PROTOCOL 支持。
             命令格式: $SET PARAM_NAME VALUE\r\n
           </p>
