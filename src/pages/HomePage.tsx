@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { useBLE } from '../hooks/useBLE';
+import { useGPS } from '../hooks/useGPS';
 import { useThemeStore } from '../store/useThemeStore';
 
 export const HomePage: React.FC = () => {
@@ -46,6 +47,7 @@ export const HomePage: React.FC = () => {
 
   const { theme, toggleTheme } = useThemeStore();
   const { connect, disconnect } = useBLE();
+  useGPS();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
